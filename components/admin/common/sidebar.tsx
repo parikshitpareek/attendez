@@ -48,13 +48,13 @@ function Sidebar() {
   }, [pathname]);
 
   return (
-    <div className="h-screen overflow-y-scroll py-4 shadow-xl flex flex-col space-y-12">
+    <div className="h-screen overflow-y-scroll py-4 shadow-xl flex flex-col ">
       {showTopBar && <TopBarProgress />}
       <div className="logo flex flex-row justify-center">
         <div>
           <img
-            src="https://raw.githubusercontent.com/karanchugh02/gfgTemp/main/homePage/logo1.png"
-            className="h-36"
+            src="/attendez_logo.png"
+            className="h-72"
           />
         </div>
       </div>
