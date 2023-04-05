@@ -1,0 +1,174 @@
+datasource db {
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Account {
+    id                Int     @id @default(autoincrement())
+    userId            Int
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@index([userId])
+    @@map("account")
+}
+
+model Session {
+    id           Int      @id @default(autoincrement())
+    sessionToken String   @unique
+    userId       Int
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@map("session")
+}
+
+enum UserType {
+    admin
+    student
+}
+
+model User {
+    id            Int             @id @default(autoincrement())
+    name          String?
+    email         String?         @unique
+    emailVerified DateTime?
+    image         String?
+    adminId       Int?
+    admin         Admin?          @relation(fields: [adminId], references: [id])
+    studentId     Int?
+    student       Student?        @relation(fields: [studentId], references: [id])
+    memberId      Int?
+    member        Member?         @relation(fields: [memberId], references: [id])
+    active        Boolean         @default(true)
+    accounts      Account[]
+    sessions      Session[]
+    Registeration Registeration[]
+
+    @@index([adminId])
+    @@index([studentId])
+    @@index([memberId])
+    @@map("user")
+}
+
+model Student {
+    id        Int     @id @default(autoincrement())
+    name      String
+    rollNo    Int
+    email     String  @unique
+    imageLink String
+    year      Int
+    active    Boolean @default(true)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    User      User[]
+
+    @@map("student")
+}
+
+enum Team {
+    Tech
+    PR
+}
+
+model Member {
+    id          Int    @id @default(autoincrement())
+    name        String
+    email       String @unique
+    year        String
+    team        Team
+    designation String
+    rollNo      Int    @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    User      User[]
+
+    @@map("member")
+}
+
+model Admin {
+    id         Int     @id @default(autoincrement())
+    superadmin Boolean @default(false)
+    members    Boolean @default(false)
+    users      Boolean @default(false)
+    events     Boolean @default(false)
+    contacts   Boolean @default(false)
+    forms      Boolean @default(false)
+    bouncer    Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    User      User[]
+
+    @@map("admin")
+}
+
+enum EventType {
+    online
+    offline
+}
+
+model Event {
+    id          Int       @id @default(autoincrement())
+    title       String
+    description String
+    poster      String
+    date        DateTime
+    eventType   EventType
+    capacity    Int
+    open        Boolean   @default(false)
+
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    Registeration Registeration[]
+
+    @@map("event")
+}
+
+model Registeration {
+    id      Int     @id @default(autoincrement())
+    eventId Int
+    event   Event   @relation(fields: [eventId], references: [id])
+    userId  Int
+    user    User    @relation(fields: [userId], references: [id])
+    qrCode  String  @db.LongText
+    visited Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([eventId, userId])
+    @@index([eventId])
+    @@index([userId])
+    @@map("registeration")
+}
+
+model Contact {
+    id      Int    @id @default(autoincrement())
+    name    String
+    email   String
+    contact String
+    message String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

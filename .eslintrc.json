@@ -1,0 +1,16 @@
+// add no used variables false
+{
+  "extends": [
+    "next/core-web-vitals",
+    "next",
+    "prettier",
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "globals": {
+    "React": "readonly"
+  },
+  "rules": {
+    // "no-unused-vars": ["error"]
+  }
+}
